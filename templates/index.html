@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Task Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <h1>Task Manager</h1>
+
+    <form action="/add_task" method="POST">
+      <input type="text" name="title" placeholder="Task title" required />
+      <input type="text" name="description" placeholder="Task description" required />
+      <button type="submit">Add Task</button>
+    </form>
+
+    <!-- Flash Messages -->
+    <ul class="flash-messages">
+      {% with messages = get_flashed_messages() %} {% if messages %} {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %} {% endif %} {% endwith %}
+    </ul>
+
+    <!-- Task List -->
+    <ul class="task-list">
+        {% for task in tasks %}
+        <li class="task-item {{ 'complete' if task['complete'] else '' }}">
+          <div class="task-content">
+            <strong class="task-title">{{ task['title'] }}</strong><br />
+            <span class="task-description">{{ task['description'] }}</span>
+          </div>
+          <div class="task-buttons">
+            <form action="/toggle_complete/{{ task['id'] }}" method="POST">
+              <button type="submit">{{ 'Mark Incomplete' if task['complete'] else 'Mark Complete' }}</button>
+            </form>
+            <form action="/edit_task/{{ task['id'] }}" method="GET">
+              <button type="submit" {% if task['complete'] %} disabled {% endif %}>Edit</button>
+            </form>
+            <form action="/delete_task/{{ task['id'] }}" method="POST">
+              <button type="submit">Delete</button>
+            </form>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+
+        const flashMessages = document.querySelectorAll('.flash-messages');
+
+        flashMessages.forEach((message) => {
+          
+          setTimeout(() => {
+            message.style.opacity = 0;
+            setTimeout(() => {
+              message.remove();
+            }, 600); 
+          }, 3000);
+        });
+      });
+    </script>
+  </body>
+</html>
